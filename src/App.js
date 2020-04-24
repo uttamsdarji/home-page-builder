@@ -13,6 +13,7 @@ function App() {
         <Router>
           <div className="App">
             <Switch>
+              <Route path="/" component={CoreLayout} />
               <Route path="/websiteBuilder" component={CoreLayout} />
             </Switch>
           </div>

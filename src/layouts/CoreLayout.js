@@ -8,12 +8,18 @@ import EditTemplate from '../routes/editTemplate/editTemplateContainer';
 import PageNotFound from '../routes/pageNotFound/PageNotFound';
 
 class CoreLayout extends React.Component {
+  componentDidMount() {
+    if(!this.props.location.pathname || this.props.location.pathname == '/') {
+      this.props.history.push('/websiteBuilder')
+    }
+  }
   render() {
     return (
       <Router>
         <div className="page-container">
           <Header />
           <Switch>
+            <Route exact path="/" component={AllTemplates} />
             <Route exact path="/websiteBuilder" component={AllTemplates} />
             <Route exact path="/websiteBuilder/savedTemplates" component={SavedTemplates} />
             <Route exact path="/websiteBuilder/editTemplate/:templateId?" component={EditTemplate} />
