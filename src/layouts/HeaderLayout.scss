@@ -1,0 +1,43 @@
+@import '../styles/base.scss';
+.header-container {
+  height: $headerHeight;
+  background: #292929;
+  padding: 0 10px;
+  box-shadow: 0 2px 3px rgba(0,0,0,.19);
+  position: fixed;
+  right: 0;
+  left: 0;
+  z-index: 1030;
+  .logo-container {
+    height: 100%;
+    float: left;
+    padding: 10px 0;
+    img {
+      height: 100%;
+    }
+  }
+  .nav-menu {
+    float: left;
+    height: 100%;
+    .nav-menu-list {
+      list-style: none;
+      color: $white;
+      margin: 0;
+      height: 100%;
+      .nav-item {
+        display: inline-block;
+        margin-right: 30px;
+        cursor: pointer;
+        padding-top: 24px;
+        padding-bottom: 22px;
+        &:hover, &.active {
+          color: $yellow;
+        }
+        &.active {
+          pointer-events: none;
+          border-bottom: 2px solid $yellow;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+@import '../styles/base.scss';
+.page-container {
+  font-family: Poppins;
+  text-align: left;
+  height: 100vh;
+}
+
+.overflow-hidden {
+  overflow: hidden !important;
+}

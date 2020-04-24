@@ -1,0 +1,62 @@
+@import '../../styles/base.scss';
+
+.text-edit-modal {
+  .modal-content {
+    .modal-body {
+      .textfield-title {
+        text-align: center;
+        font-size: 20px;
+        margin: 20px 0;
+        color: $black;
+        font-weight: 600;
+      }
+      .textfiled-input-container {
+        width: 50%;
+        margin: 0 auto;
+        &.textArea {
+          min-height: 200px;
+          width: 100%;
+        }
+        input, textarea {
+          padding: 10px;
+          width: 100%;
+          border-radius: 5px;
+          box-shadow: none;
+          border: 1px solid $grey;
+        }
+        textarea {
+          height: 200px;
+        }
+      }
+      .textfield-action-btns {
+        width: 50%;
+        margin: 20px auto;
+        display: flex;
+        justify-content: space-around;
+        span {
+          padding: 5px;
+          display: inline-block;
+          width: 40%;
+          text-align: center;
+          border-radius: 20px;
+          cursor: pointer;
+        }
+        .cancel-btn {
+          border: 1px solid $red;
+          background: $red;
+          color: $white;
+        }
+        .submit-btn {
+          background: $linkBlue;
+          color: #fff;
+          border: 1px solid $linkBlue;
+          &.disabled {
+            background: $grey;
+            border: 1px solid $grey;
+            pointer-events: none;
+          }
+        }
+      }
+    }
+  }
+}
