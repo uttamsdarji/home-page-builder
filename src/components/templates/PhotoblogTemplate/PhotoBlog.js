@@ -7,8 +7,11 @@ import cssExport from './exportStyle';
 import JSZip from 'jszip';
 import {saveAs} from 'file-saver';
 import {connect} from 'react-redux';
-import {undoPhotoBlog, redoPhotoBlog, changeCoverPhoto, resetTemplate, removeDefaultPhotos, addPhoto, changeUserPhoto, convertImagestoBase64} from '../../../store/actions/templateActions/photoBlogActions';
-import {getTemplateFromStorage} from '../../../store/actions/templateActions/commonTemplateActions';
+import {OverlayTrigger,Tooltip} from 'react-bootstrap';
+import Loader from '../../Loader';
+import SaveModal from '../../SaveModal/SaveModal';
+import {changeCoverPhoto, removeDefaultPhotos, addPhoto, changeUserPhoto, convertImagestoBase64} from '../../../store/actions/templateActions/photoBlogActions';
+import {undoTemplate, redoTemplate, getTemplateFromDb, resetTemplate, saveTemplate} from '../../../store/actions/templateActions/commonTemplateActions';
 
 const toBase64 = file => new Promise((resolve, reject) => {
   const reader = new FileReader();
@@ -26,11 +29,12 @@ class PhotoBlog extends React.Component {
     super(props);
     this.state = {
       textEditorOpen: false,
-      textEditorProps: {}
+      textEditorProps: {},
+      saveModalOpen: false
     }
   }
   componentDidMount() {
-    this.props.getTemplateFromStorage('photoBlog');
+    this.props.getTemplateFromDb('photoBlog');
     this.props.convertImagestoBase64();
   }
   componentDidUpdate(prevProps) {
@@ -55,6 +59,11 @@ class PhotoBlog extends React.Component {
     this.setState({
       textEditorOpen: !this.state.textEditorOpen,
       textEditorProps
+    })
+  }
+  toggleSaveModal = () => {
+    this.setState({
+      saveModalOpen: !this.state.saveModalOpen
     })
   }
   preventDefault = (e) => {
@@ -112,6 +121,7 @@ class PhotoBlog extends React.Component {
     let {data} = this.props;
     return (
       <div className="photo-blog-template">
+        <Loader loading={this.props.loading}></Loader>
         <div className="template-preview" ref={(container) => {this.templateContainer = container}}>
             <nav className="navbar navbar-expand-lg">
               <a className="navbar-brand" href="#" onClick={(e) => {this.toggleTextEditor(e,'navBrand',data.textFields.navBrand,'Website Title')}}>{data.textFields.navBrand}</a>
@@ -133,7 +143,7 @@ class PhotoBlog extends React.Component {
                 </ul>
               </div>
             </nav>
-            <main class="main-content">
+            <main className="main-content">
               <section className="site-section-hero bg-image" style={{backgroundImage: `url(${data.coverImage})`, backgroundPosition: `50% 0px`}} id="home">
                 <div className="row justify-content-center align-items-center">
                   <div className="col-md-7 text-center">
@@ -183,19 +193,21 @@ class PhotoBlog extends React.Component {
         </div>
         <div className="template-edit-container">
           <div className="template-edit-title">Photo Blog 
-            {this.props.templateEdited &&
-              <span className="downlaod-btn" onClick={this.downloadTemplate} title="Download Template"><i class="fas fa-download"></i></span>
-            }
-            {this.props.templateEdited &&
-              <span className="template-reset-btn" onClick={this.props.resetTemplate}>Reset</span>
-            }
+            <OverlayTrigger placement={'right'} overlay={<Tooltip>Download Template</Tooltip>}>
+              <span className="downlaod-btn" onClick={this.downloadTemplate}><i className="fas fa-download"></i></span>
+            </OverlayTrigger>
+            <span className="template-reset-btn" onClick={() => this.props.resetTemplate('photoBlog')}>Reset</span>
           </div>
+          <div className="save-btn" onClick={this.toggleSaveModal}>
+            Save Template <i className="fas fa-download"></i>
+          </div>
+          <SaveModal show={this.state.saveModalOpen} onHide={this.toggleSaveModal} onSave={() => this.props.saveTemplate('photoBlog')}/>
           <div className="undo-btns">
-            <span onClick={this.props.undoPhotoBlog} className={`undo ${this.props.prevData && this.props.prevData.length > 0 ? '' : 'disabled'}`}>
+            <span onClick={() => this.props.undoTemplate('photoBlog')} className={`undo ${this.props.prevData && this.props.prevData.length > 0 ? '' : 'disabled'}`}>
               <i className="fas fa-undo"></i>
               <div className="undo-text">Undo</div>
             </span>
-            <span onClick={this.props.redoPhotoBlog} className={`redo ${this.props.nextData && this.props.nextData.length > 0 ? '' : 'disabled'}`}>
+            <span onClick={() => this.props.redoTemplate('photoBlog')} className={`redo ${this.props.nextData && this.props.nextData.length > 0 ? '' : 'disabled'}`}>
               <i className="fas fa-redo"></i>
               <div className="undo-text">Redo</div>
             </span>
@@ -237,19 +249,21 @@ const mapStateToProps = (state) => ({
   data: state.photoBlog.data,
   prevData: state.photoBlog.prevState,
   nextData: state.photoBlog.nextState,
-  templateEdited: state.photoBlog.templateEdited
+  templateEdited: state.photoBlog.templateEdited,
+  loading: state.editTemplate.loading
 })
 
 const mapDispatchToProps = (dispatch)  => ({
-  undoPhotoBlog: () => dispatch(undoPhotoBlog()),
-  redoPhotoBlog: () => dispatch(redoPhotoBlog()),
+  undoTemplate: (templateId) => dispatch(undoTemplate(templateId)),
+  redoTemplate: (templateId) => dispatch(redoTemplate(templateId)),
   changeCoverPhoto: (photo) => dispatch(changeCoverPhoto(photo)),
-  resetTemplate: () => dispatch(resetTemplate()),
+  resetTemplate: (templateId) => dispatch(resetTemplate(templateId)),
   removeDefaultPhotos: () => dispatch(removeDefaultPhotos()),
   addPhoto: (photo) => dispatch(addPhoto(photo)),
   changeUserPhoto: (photo) => dispatch(changeUserPhoto(photo)),
-  getTemplateFromStorage: (templateId) => dispatch(getTemplateFromStorage(templateId)),
-  convertImagestoBase64: () => dispatch(convertImagestoBase64())
+  getTemplateFromDb: (templateId) => dispatch(getTemplateFromDb(templateId)),
+  convertImagestoBase64: () => dispatch(convertImagestoBase64()),
+  saveTemplate: (templateId) => dispatch(saveTemplate(templateId))
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(PhotoBlog);

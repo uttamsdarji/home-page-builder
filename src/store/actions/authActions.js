@@ -35,6 +35,7 @@ export function logout(cb) {
       if(cb) {
         cb()
       }
+      dispatch({type: 'USER_LOGOUT'});
       dispatch({type: 'SHOW_MAIN_LOADER', show: false});
     });
   }

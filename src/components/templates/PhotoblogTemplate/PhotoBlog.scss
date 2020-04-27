@@ -3,6 +3,13 @@
 .photo-blog-template {
   height: 100%;
   display: flex;
+  .loading-container {
+    position: absolute;
+    z-index: 10;
+    width: 80%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+  }
   .template-preview {
     width: 80%;
     border-right: 1px solid $grey;

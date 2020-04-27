@@ -1,30 +1,113 @@
-export const saveTemplateToLocalStorage = (templateId) => {
-  return (dispatch,getState) => {
-    let template = getState()[templateId];
-    // localStorage.setItem(templateId, JSON.stringify(template));
+export const saveTemplate = (templateId) => {
+  return (dispatch,getState, {getFirebase, getFirestore}) => {
+    dispatch({type: "SHOW_EDIT_TEMPLATE_LOADER", show: true})
+    const firestore = getFirestore();
+    const userId = getState().firebase.auth.uid;
+    let template = {...getState()[templateId].data};
+    delete template.coverImage;
+    delete template.photos;
+    delete template.userImage;
+    if(userId) {
+      firestore.collection('users').doc(userId).update({
+        templates: {
+          [templateId]: template
+        }
+      }).then(() => {
+        dispatch({type: "SHOW_EDIT_TEMPLATE_LOADER", show: false})
+      })
+    }
   }
 }
 
-export const deleteTemplateFromLocalStorage = (templateId) => {
-  localStorage.removeItem(templateId);
+export const deleteTemplateFromDb = (templateId) => {
+  return (dispatch,getState, {getFirebase, getFirestore}) => {
+    const firestore = getFirestore();
+    const userId = getState().firebase.auth.uid;
+    dispatch({type: "SHOW_SAVED_TEMPLATES_LOADER", show: true})
+    if(userId) {
+      firestore.collection('users').doc(userId).update({
+        templates: {
+          [templateId]: null
+        }
+      }).then(() => {
+        let keys = [...getState().savedTemplates.savedTemplateIds];
+        if(keys.indexOf(templateId) > -1) {
+          keys = keys.slice(0,keys.indexOf(templateId)).concat(keys.slice(keys.indexOf(templateId) + 1, keys.length));
+          dispatch({type: "ADD_SAVED_TEMPLATE_KEYS", keys})
+        }
+        dispatch({type: "SHOW_SAVED_TEMPLATES_LOADER", show: false})
+      })
+      dispatch({type: `RESET_${templateId}_TEPLATE`})
+      dispatch({type: "SHOW_SAVED_TEMPLATES_LOADER", show: false})
+    }
+  }
 }
 
-export const getTemplateFromStorage = (templateId) => {
-  return (dispatch,getState) => {
-    let template = localStorage.getItem(templateId);
-    if(template) {
-      let newState = JSON.parse(template)
-      dispatch({type: `SAVE_${templateId}_FROM_STORAGE`, newState})
+export const getSavedTemplatesId = () => {
+  return (dispatch,getState,{getFirebase, getFirestore}) => {
+    dispatch({type: "SHOW_SAVED_TEMPLATES_LOADER", show: true})
+    const firestore = getFirestore();
+    const userId = getState().firebase.auth.uid;
+    if(userId) {
+      firestore.collection('users').doc(userId).get().then((doc) => {
+        let templates = doc.data() && doc.data().templates;
+        if(templates && Object.keys(templates).length > 0) {
+          let keys = [];
+          Object.keys(templates).forEach((templateId) => {
+            if(templates[templateId] && Object.keys(templates[templateId]).length > 0) {
+              keys.push(templateId);  
+            }
+          })
+          dispatch({type: "ADD_SAVED_TEMPLATE_KEYS", keys})
+        }
+        dispatch({type: "SHOW_SAVED_TEMPLATES_LOADER", show: false})
+      }).catch(() => {
+        dispatch({type: "SHOW_SAVED_TEMPLATES_LOADER", show: false})
+      })
     }
+  }
+}
+
+export const getTemplateFromDb = (templateId) => {
+  return (dispatch,getState,{getFirebase, getFirestore}) => {
+    dispatch({type: "SHOW_EDIT_TEMPLATE_LOADER", show: true})
+    const firestore = getFirestore();
+    const userId = getState().firebase.auth.uid;
+    if(userId) {
+      firestore.collection('users').doc(userId).get().then((doc) => {
+        let templates = doc.data() && doc.data().templates;
+        if(templates && templates[templateId]) {
+          dispatch({type: `SAVE_${templateId}_FROM_STORAGE`, newState: templates[templateId]})
+        }
+        dispatch({type: "SHOW_EDIT_TEMPLATE_LOADER", show: false})
+      }).catch(() => {
+        dispatch({type: "SHOW_EDIT_TEMPLATE_LOADER", show: false})
+      })
+    }
+  }
+}
+
+export function resetTemplate(templateId) {
+  return (dispatch,getState) => {
+    dispatch({type: `RESET_${templateId}_TEPLATE`})
+  }
+}
+
+export function undoTemplate(templateId) {
+  return (dispatch,getState) => {
+    dispatch({type: `UNDO_${templateId}`})
+  }
+}
+
+export function redoTemplate(templateId) {
+  return (dispatch,getState) => {
+    dispatch({type: `REDO_${templateId}`})
   }
 }
 
 export function editTextField(templateId,fieldKey,fieldValue) {
   return (dispatch,getState) => {
     dispatch({ type: `EDIT_${templateId}_TEXT_FIELD`, fieldKey, fieldValue})
-    setTimeout(() => {
-      dispatch(saveTemplateToLocalStorage(templateId))
-    },1000)
   }
 }
 

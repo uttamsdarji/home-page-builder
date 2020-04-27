@@ -14,8 +14,8 @@ class AllTemplates extends React.Component {
             {allTemplates && allTemplates.templates && allTemplates.templates.length > 0 &&
               allTemplates.templates.map((template,index) => {
                 return (
-                  <div className="col-12 col-md-12 col-lg-4">
-                    <Link className="template-container" key={index} to={`/websiteBuilder/editTemplate/${template.id}`}>
+                  <div className="col-12 col-md-12 col-lg-4" key={index}>
+                    <Link className="template-container" to={`/websiteBuilder/editTemplate/${template.id}`}>
                       <div className="template-thumbnail">
                         <img src={template.thumbnail} alt={template.name} />
                       </div>

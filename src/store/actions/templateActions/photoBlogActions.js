@@ -1,46 +1,14 @@
-import {saveTemplateToLocalStorage, deleteTemplateFromLocalStorage} from './commonTemplateActions';
 import image2base64 from 'image-to-base64';
-
-export function undoPhotoBlog() {
-    return (dispatch,getState) => {
-      dispatch({type: 'UNDO_photoBlog'})
-      setTimeout(() => {
-        dispatch(saveTemplateToLocalStorage('photoBlog'))
-      },1000)
-    }
-  }
-  
-export function redoPhotoBlog() {
-  return (dispatch,getState) => {
-    dispatch({type: 'REDO_photoBlog'})
-    setTimeout(() => {
-      dispatch(saveTemplateToLocalStorage('photoBlog'))
-    },1000)
-  }
-}
 
 export function changeCoverPhoto(photo,notEdited) {
   return (dispatch,getState) => {
     dispatch({type: 'CHANGE_photoBlog_COVER_PHOTO', photo, notEdited})
-    setTimeout(() => {
-      dispatch(saveTemplateToLocalStorage('photoBlog'))
-    },1000)
   }
 }
 
 export function changeUserPhoto(photo,notEdited) {
   return (dispatch,getState) => {
     dispatch({type: 'CHANGE_photoBlog_USER_PHOTO', photo, notEdited})
-    setTimeout(() => {
-      dispatch(saveTemplateToLocalStorage('photoBlog'))
-    },1000)
-  }
-}
-
-export function resetTemplate() {
-  return (dispatch,getState) => {
-    dispatch({type: "RESET_photoBlog_TEPLATE"})
-    deleteTemplateFromLocalStorage('photoBlog');
   }
 }
 
@@ -53,9 +21,6 @@ export function removeDefaultPhotos() {
 export function addPhoto(photo, index, notEdited) {
   return (dispatch,getState) => {
     dispatch({type: "ADD_photoBlog_PHOTO", photo, index, notEdited})
-    setTimeout(() => {
-      dispatch(saveTemplateToLocalStorage('photoBlog'))
-    },1000)
   }
 }
 

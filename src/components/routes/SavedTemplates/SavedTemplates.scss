@@ -1,0 +1,15 @@
+.delete-template-icon {
+  position: absolute;
+  right: 20px;
+  font-size: 25px;
+  cursor: pointer;
+  display: none;
+}
+
+.saved-template-card {
+  &:hover {
+    .delete-template-icon {
+      display: block;
+    }
+  }
+}

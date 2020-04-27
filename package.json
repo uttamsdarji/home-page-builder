@@ -21,7 +21,7 @@
     "image-to-base64": "2.0.1",
     "firebase": "7.14.2",
     "react-redux-firebase": "2.2.4",
-    "redux-firestore": "0.5.7"
+    "redux-firestore": "0.13.0"
   },
   "scripts": {
     "start": "react-scripts start NODE_ENV=development",

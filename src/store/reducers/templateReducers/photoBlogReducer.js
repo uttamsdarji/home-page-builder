@@ -116,7 +116,13 @@ const photoBlogReducer = (state = initialState, action) => {
       }
     case "SAVE_photoBlog_FROM_STORAGE":
       return {
-        ...action.newState
+        ...state,
+        data : {
+          ...action.newState,
+          coverImage: state.data.coverImage,
+          photos: [...state.data.photos],
+          userImage: state.data.userImage
+        }
       }
     default:
       return state
