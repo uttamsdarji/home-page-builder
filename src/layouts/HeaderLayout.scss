@@ -8,34 +8,79 @@
   right: 0;
   left: 0;
   z-index: 1030;
+  .navbar {
+    height: 100%;
+    padding: 0 10px;
+  }
   .logo-container {
     height: 100%;
-    float: left;
     padding: 10px 0;
     img {
       height: 100%;
     }
   }
+  .logout-btn {
+    background: $linkBlue;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    color: $white;
+    &:hover {
+      background: $hoverBlue;
+    }
+  }
   .nav-menu {
-    float: left;
     height: 100%;
+    &.collapse.show {
+      background: $black;
+      height: auto;
+      .nav-menu-list {
+        .nav-item {
+          margin-top: 10px;
+          .nav-link {
+            padding-bottom: 10px;
+          }
+          &.active {
+            .nav-link {
+              border-bottom: none;
+            }   
+          }
+        }
+      }
+      .logout-btn {
+        width: 25%;
+        margin-left: 10px;
+        margin-bottom: 10px;
+        margin-top: 10px;
+      }
+    }
     .nav-menu-list {
       list-style: none;
       color: $white;
-      margin: 0;
+      justify-content: flex-start;
+      margin-left: 15px;
       height: 100%;
       .nav-item {
         display: inline-block;
         margin-right: 30px;
-        cursor: pointer;
-        padding-top: 24px;
-        padding-bottom: 22px;
+        margin-top: 15px;
+        .nav-link {
+          cursor: pointer;
+          color: $white;
+          text-decoration: none;
+          padding-bottom: 23px;
+          outline: none;
+        }
         &:hover, &.active {
-          color: $yellow;
+          .nav-link {
+            color: $yellow;
+          }
         }
         &.active {
-          pointer-events: none;
-          border-bottom: 2px solid $yellow;
+          .nav-link {
+            pointer-events: none;
+            border-bottom: 2px solid $yellow;           
+          }
         }
       }
     }

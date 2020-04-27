@@ -1,0 +1,52 @@
+@import '../../../styles/base.scss';
+
+.login-layout {
+  padding-top: $headerHeight;
+  .login-container {
+    margin-top: 100px;
+    margin-bottom: 100px;
+    padding: 20px;
+    background: $grey;
+    border-radius: 10px;
+    box-shadow: 0 4px 5px rgba(0,0,0,.1);
+    .login-title {
+      text-align: center;
+      font-size: 33px;
+      font-weight: 600;
+      color: $black;
+    }
+    .login-form-container {
+      .form-label-group {
+        margin-bottom: 20px;
+      }
+      label {
+        padding: 10px 0;
+        color: $black;
+        font-size: 18px;
+        font-weight: 500;
+      }
+      .login-error {
+        color: $red;
+        margin-left: 10px;
+        font-size: 12px;
+      }
+      .btn-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+        margin: 10px 0;
+        .signin-btn {
+          padding: 10px 30px;
+          font-size: 18px;
+          background: $linkBlue;
+          border-radius: 10px;
+          color: $white;
+          cursor: pointer;
+          &:hover {
+            background: $hoverBlue;
+          }
+        }
+      }
+    }
+  }
+}

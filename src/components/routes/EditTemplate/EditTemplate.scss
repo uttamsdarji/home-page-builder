@@ -1,0 +1,71 @@
+@import '../../../styles/base.scss';
+
+.edit-template-wrapper {
+  padding-top: $headerHeight;
+  height: calc(100% - #{$headerHeight});
+  position: relative;
+  .edit-template-container {
+    height: 100%;
+    .template-edit-container {
+      .template-edit-title {
+        font-size: 20px;
+        color: $black;
+        font-weight: 500;
+        margin-bottom: 20px;
+        .template-reset-btn {
+          font-size: 12px;
+          position: absolute;
+          right: 0;
+          margin-right: 15px;
+          margin-top: 7px;
+          color: $red;
+          cursor: pointer;
+        }
+        .downlaod-btn {
+          font-size: 16px;
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          cursor: pointer;
+        }
+      }
+      .undo-btns {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+        .undo, .redo {
+          cursor: pointer;
+          color: $black;
+          &.disabled {
+            pointer-events: none;
+            color: $darkGrey;
+          }
+        }
+      }
+    }
+  }
+}
+.select-template-container {
+  width: 50%;
+  margin: 158px auto;
+  text-align: center;
+  .select-template-title {
+    font-size: 30px;
+    color: $black;
+  }
+  .select-template-btn {
+    width: max-content;
+    margin: 20px auto;
+    font-size: 24px;
+    background: $linkBlue;
+    padding: 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    color: $black;
+    &:hover {
+      transition: 0.25 ease all;
+      box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.5);
+    }
+  }
+}

@@ -1,0 +1,36 @@
+@import '../styles/base.scss';
+
+.page-not-found-wrapper {
+  padding-top: $headerHeight;
+  height: calc(100% - #{$headerHeight});
+  .page-not-found-container {
+    width: 50%;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    margin-top: 50px;
+    .pagenotfound_image {
+      background: url('../assets/pagenotfound_image.png') no-repeat;
+      height: 250px;
+      width: 30%;
+      margin: 0 auto;
+      position: relative;
+      &:after {
+        content: "Page";
+        display: inline-block;
+        position: absolute;
+        top: 35%;
+        right: 30%;
+        color: $white;
+        font-size: 26px;
+      }
+    }
+    .not-found-text {
+      font-size: 28px;
+      color: $black;
+      font-weight: 500;
+      line-height: 33px;
+      margin-top: 20px;
+    }
+  }
+}

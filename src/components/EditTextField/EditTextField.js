@@ -1,8 +1,10 @@
 import React from 'react';
 import {Modal} from 'react-bootstrap';
+import {connect} from 'react-redux';
+import {editTextField} from '../../store/actions/templateActions/commonTemplateActions';
 import './EditTextField.scss';
 
-export default class EditTextField extends React.Component {
+class EditTextField extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -59,3 +61,9 @@ export default class EditTextField extends React.Component {
     )
   }
 }
+
+const mapDispatchToProps = (dispatch) => ({
+  editTextField: (templateId,fieldKey,fieldValue) => dispatch(editTextField(templateId,fieldKey,fieldValue))
+})
+
+export default connect(null,mapDispatchToProps)(EditTextField)
