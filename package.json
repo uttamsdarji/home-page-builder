@@ -29,6 +29,10 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uttamsdarji/home-page-builder.git"
+  },
   "eslintConfig": {
     "extends": "react-app"
   },
