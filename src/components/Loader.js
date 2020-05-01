@@ -7,8 +7,11 @@ export default class Loader extends React.Component {
     return (
       <React.Fragment>
         {this.props.loading ?
-          <div className="loading-container">
+          <div className={`loading-container ${this.props.className ? this.props.className : ''}`}>
             <img src={loader} className="loader"/>
+            {this.props.loadingText &&
+              <div className="loading-text">{this.props.loadingText}</div>
+            }
           </div>
           :
           this.props.children

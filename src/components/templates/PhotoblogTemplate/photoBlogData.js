@@ -23,24 +23,26 @@ export const photoBlogBasicData = {
 export const photoBlogDetailData = {
   id: 'photoBlog',
   name: 'Photo Blog',
-  coverImage: coverImage,
-  photos: [
-    photo1,
-    photo2,
-    photo3,
-    photo4,
-    photo5,
-    photo6,
-    photo7,
-    photo8,
-    photo9
-  ],
+  photos: {
+    coverImage: {image: coverImage, file: null},
+    userImage: {image: userImage, file: null},
+    otherPhotos: [
+      {image: photo1, file: null},
+      {image: photo2, file: null},
+      {image: photo3, file: null},
+      {image: photo4, file: null},
+      {image: photo5, file: null},
+      {image: photo6, file: null},
+      {image: photo7, file: null},
+      {image: photo8, file: null},
+      {image: photo9, file: null}
+    ]
+  },
   textFields: {
     navBrand: 'Your Name',
     welcomeTitle: 'Welcome',
     welcomeText: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Tempore animi accusantium voluptatum saepe. Natus nihil, facere corporis numquam, architecto dolorum.',
     bioTitle: "Hi I'm Jed",
     bioDetails: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolor aperiam a velit. Harum eligendi quod reiciendis quos ullam libero est dolor, corporis dolores assumenda, delectus, quidem voluptatibus dolorum temporibus enim!"
-  },
-  userImage: userImage,
+  }
 }

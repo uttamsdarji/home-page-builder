@@ -44,6 +44,7 @@ class Header extends React.Component {
   }
   render() {
     let isAuthenticated = this.props.user && this.props.user.uid;
+    let userInitials = this.props.profile && this.props.profile.initials;
     return (
       <div className="header-container">
         
@@ -70,6 +71,9 @@ class Header extends React.Component {
                   </li>
                 </ul>
                 <div onClick={this.logout} className="logout-btn">Logout</div>
+                {userInitials &&
+                  <div className="user-initials">{userInitials}</div>
+                }
               </div>
             </React.Fragment>
           }
@@ -81,6 +85,7 @@ class Header extends React.Component {
 
 const mapStateToProps = (state) => ({
   user: state.firebase.auth,
+  profile: state.firebase.profile,
   loading: state.basicData.loading
 })
 

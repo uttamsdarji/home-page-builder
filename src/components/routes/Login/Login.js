@@ -49,12 +49,12 @@ class Login extends React.Component {
     let emailError = this.props.loginError && (this.props.loginError.code == "auth/user-not-found") && "*Email doesn't exist";
     return (
       <div className = "login-layout row">
-        <div className="login-container col-sm-8 col-md-6 col-lg-4 mx-auto">
+        <div className="login-container col-10 col-sm-8 col-md-6 col-lg-4 mx-auto">
           <div className="login-title">Login</div>
           <div className="login-form-container">
           <form className="form-signin" onSubmit={this.login}>
               <div className="form-label-group">
-                <label htmlFor="inputEmail">Email</label>
+                <label htmlFor="inputEmail">Email<span className="red-star">*</span></label>
                 {!!emailError && 
                   <span className="login-error">{emailError}</span>
                 }
@@ -62,7 +62,7 @@ class Login extends React.Component {
               </div>
 
               <div className="form-label-group">
-                <label htmlFor="inputPassword">Password</label>
+                <label htmlFor="inputPassword">Password<span className="red-star">*</span></label>
                 {!!passwordError && 
                   <span className="login-error">{passwordError}</span>
                 }

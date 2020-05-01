@@ -3,20 +3,17 @@ import EditTextField from '../../EditTextField/EditTextField';
 import {getHTMLHeader} from '../../../store/actions/templateActions/commonTemplateActions';
 import './PhotoBlog.scss';
 import './PhotoBlogTemplate.css';
-import cssExport from './exportStyle';
-import JSZip from 'jszip';
-import {saveAs} from 'file-saver';
 import {connect} from 'react-redux';
 import {OverlayTrigger,Tooltip} from 'react-bootstrap';
 import Loader from '../../Loader';
 import SaveModal from '../../SaveModal/SaveModal';
-import {changeCoverPhoto, removeDefaultPhotos, addPhoto, changeUserPhoto, convertImagestoBase64} from '../../../store/actions/templateActions/photoBlogActions';
+import {changeCoverPhoto, removeDefaultPhotos, addPhoto, changeUserPhoto, convertImagestoBase64, downloadTemplate} from '../../../store/actions/templateActions/photoBlogActions';
 import {undoTemplate, redoTemplate, getTemplateFromDb, resetTemplate, saveTemplate} from '../../../store/actions/templateActions/commonTemplateActions';
 
 const toBase64 = file => new Promise((resolve, reject) => {
   const reader = new FileReader();
   reader.readAsDataURL(file);
-  reader.onload = () => resolve(reader.result);
+  reader.onload = () => resolve({image: reader.result, file});
   reader.onerror = error => reject(error);
 });
 
@@ -101,27 +98,13 @@ class PhotoBlog extends React.Component {
     }
   }
   downloadTemplate = () => {
-    let header = getHTMLHeader(this.props.data.textFields.navBrand || '');
-    let template = document.querySelector('.template-preview').outerHTML;
-    let html = `<!DOCTYPE html>
-                    <html lang="en">
-                    ${header}
-                    <body data-spy="scroll" data-target="#yourNavId" data-offset="100">
-                    ${template}
-                    </body>
-                    </html>`
-    var zip = new JSZip();
-    zip.file("index.html", html);
-    zip.file("style.css",cssExport);
-    zip.generateAsync({type:"blob"}).then(function(content) {
-      saveAs(content, "photoBlog.zip");
-    });
+    this.props.downloadTemplate()
   }
   render() {
     let {data} = this.props;
     return (
       <div className="photo-blog-template">
-        <Loader loading={this.props.loading}></Loader>
+        <Loader loading={this.props.loading || this.props.downloadLoading} className={this.props.downloadLoading ? 'downloadLoader' : ''} loadingText={this.props.downloadLoading ? 'Downloading' : ''}></Loader>
         <div className="template-preview" ref={(container) => {this.templateContainer = container}}>
             <nav className="navbar navbar-expand-lg">
               <a className="navbar-brand" href="#" onClick={(e) => {this.toggleTextEditor(e,'navBrand',data.textFields.navBrand,'Website Title')}}>{data.textFields.navBrand}</a>
@@ -144,7 +127,7 @@ class PhotoBlog extends React.Component {
               </div>
             </nav>
             <main className="main-content">
-              <section className="site-section-hero bg-image" style={{backgroundImage: `url(${data.coverImage})`, backgroundPosition: `50% 0px`}} id="home">
+              <section className="site-section-hero bg-image" style={{backgroundImage: `url(${data.photos.coverImage.fileUrl || data.photos.coverImage.image})`, backgroundPosition: `50% 0px`}} id="home">
                 <div className="row justify-content-center align-items-center">
                   <div className="col-md-7 text-center">
                     <h1 className="text-white heading text-uppercase" onClick={(e) => {this.toggleTextEditor(e,'welcomeTitle',data.textFields.welcomeTitle)}}>
@@ -160,12 +143,12 @@ class PhotoBlog extends React.Component {
                 <section className="row align-items-stretch photos" id="photos">
                   <div className="col-12">
                     <div className="row align-items-stretch">
-                      {data.photos && data.photos.length > 0 &&
-                        data.photos.map((photo,index) => {
+                      {data.photos && data.photos.otherPhotos && data.photos.otherPhotos.length > 0 &&
+                        data.photos.otherPhotos.map((photo,index) => {
                           return (
                             <div className="col-6 col-md-6 col-lg-4 photo-container" key={index}>
-                              <a href={photo} target="_blank" className="d-block photo-item">
-                                <img src={photo} alt="Image" className="img-fluid" />
+                              <a href={photo.fileUrl || photo.image} target="_blank" className="d-block photo-item">
+                                <img src={photo.fileUrl || photo.image} alt="Image" className="img-fluid" />
                               </a>
                             </div>
                           )
@@ -179,7 +162,7 @@ class PhotoBlog extends React.Component {
                     <div className="row justify-content-center">
                       <div className="col-md-8">
                       <h2 className="heading text-uppercase text-white">Biography</h2>
-                      <figure className="mb-5" ><img src={data.userImage} alt="Image" className="img-fluid w-50 rounded" /></figure>
+                      <figure className="mb-5" ><img src={data.photos.userImage.fileUrl || data.photos.userImage.image} alt="Image" className="img-fluid w-50 rounded" /></figure>
                       <div className="aos-init">
                         <h2 className="text-white" onClick={(e) => {this.toggleTextEditor(e,'bioTitle',data.textFields.bioTitle,'User Name')}}>{data.textFields.bioTitle}</h2>
                         <p onClick={(e) => {this.toggleTextEditor(e,'bioDetails',data.textFields.bioDetails,'User Details',true)}}>{data.textFields.bioDetails}</p>
@@ -192,6 +175,7 @@ class PhotoBlog extends React.Component {
             </main>
         </div>
         <div className="template-edit-container">
+          <div className={`mask ${this.props.loading || this.props.downloadLoading ? 'show' : ''}`}></div>
           <div className="template-edit-title">Photo Blog 
             <OverlayTrigger placement={'right'} overlay={<Tooltip>Download Template</Tooltip>}>
               <span className="downlaod-btn" onClick={this.downloadTemplate}><i className="fas fa-download"></i></span>
@@ -250,7 +234,8 @@ const mapStateToProps = (state) => ({
   prevData: state.photoBlog.prevState,
   nextData: state.photoBlog.nextState,
   templateEdited: state.photoBlog.templateEdited,
-  loading: state.editTemplate.loading
+  loading: state.editTemplate.loading,
+  downloadLoading: state.photoBlog.downloadLoading
 })
 
 const mapDispatchToProps = (dispatch)  => ({
@@ -263,7 +248,8 @@ const mapDispatchToProps = (dispatch)  => ({
   changeUserPhoto: (photo) => dispatch(changeUserPhoto(photo)),
   getTemplateFromDb: (templateId) => dispatch(getTemplateFromDb(templateId)),
   convertImagestoBase64: () => dispatch(convertImagestoBase64()),
-  saveTemplate: (templateId) => dispatch(saveTemplate(templateId))
+  saveTemplate: (templateId) => dispatch(saveTemplate(templateId)),
+  downloadTemplate: () => dispatch(downloadTemplate())
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(PhotoBlog);

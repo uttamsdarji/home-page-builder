@@ -4,9 +4,7 @@ export const saveTemplate = (templateId) => {
     const firestore = getFirestore();
     const userId = getState().firebase.auth.uid;
     let template = {...getState()[templateId].data};
-    delete template.coverImage;
     delete template.photos;
-    delete template.userImage;
     if(userId) {
       firestore.collection('users').doc(userId).update({
         templates: {

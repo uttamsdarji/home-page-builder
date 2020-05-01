@@ -4,7 +4,9 @@ const initialState = {
   data: photoBlogDetailData,
   prevState: [],
   nextState: [],
-  templateEdited: false
+  templateEdited: false,
+  photoDataBeforeDownlaod: {},
+  downloadLoading: false
 }
 
 const photoBlogReducer = (state = initialState, action) => {
@@ -43,7 +45,13 @@ const photoBlogReducer = (state = initialState, action) => {
           ...state,
           data: {
             ...state.data,
-            coverImage: action.photo
+            photos: {
+              ...state.data.photos,
+              coverImage: {
+                image: action.image,
+                file: action.file
+              }
+            }
           }
         }
       } else {
@@ -51,7 +59,13 @@ const photoBlogReducer = (state = initialState, action) => {
           ...state,
           data: {
             ...state.data,
-            coverImage: action.photo
+            photos: {
+              ...state.data.photos,
+              coverImage: {
+                image: action.image,
+                file: action.file
+              }
+            }
           },
           prevState: state.prevState.concat([{...state.data}]),
           nextState: [],
@@ -67,18 +81,26 @@ const photoBlogReducer = (state = initialState, action) => {
         ...state,
         data: {
           ...state.data,
-          photos: []
-        }
+          photos: {
+            ...state.data.photos,
+            otherPhotos: []
+          }
+        },
+        prevState: state.prevState.concat([{...state.data}]),
+        nextState: [],
       }
     case "ADD_photoBlog_PHOTO":
       if(action.notEdited) {
-        let newPhotos = [...state.data.photos];
-        newPhotos[action.index] = action.photo;
+        let newPhotos = [...state.data.photos.otherPhotos];
+        newPhotos[action.index] = {image: action.image, file: action.file};
         return {
           ...state,
           data: {
             ...state.data,
-            photos: newPhotos
+            photos: {
+              ...state.data.photos,
+              otherPhotos: newPhotos
+            }
           }
         }
       } else {
@@ -86,7 +108,10 @@ const photoBlogReducer = (state = initialState, action) => {
           ...state,
           data: {
             ...state.data,
-            photos: state.data.photos.concat([action.photo])
+            photos: {
+              ...state.data.photos,
+              otherPhotos: state.data.photos.otherPhotos.concat([{image: action.image, file: action.file}])
+            }
           },
           prevState: state.prevState.concat([{...state.data}]),
           nextState: [],
@@ -99,7 +124,13 @@ const photoBlogReducer = (state = initialState, action) => {
           ...state,
           data: {
             ...state.data,
-            userImage: action.photo
+            photos: {
+              ...state.data.photos,
+              userImage: {
+                image: action.image,
+                file: action.file
+              }
+            }
           }
         }
       } else {
@@ -107,7 +138,13 @@ const photoBlogReducer = (state = initialState, action) => {
           ...state,
           data: {
             ...state.data,
-            userImage: action.photo
+            photos: {
+              ...state.data.photos,
+              userImage: {
+                image: action.image,
+                file: action.file
+              }
+            }
           },
           prevState: state.prevState.concat([{...state.data}]),
           nextState: [],
@@ -119,10 +156,48 @@ const photoBlogReducer = (state = initialState, action) => {
         ...state,
         data : {
           ...action.newState,
-          coverImage: state.data.coverImage,
-          photos: [...state.data.photos],
-          userImage: state.data.userImage
+          photos: {
+            ...state.data.photos
+          }
         }
+      }
+    case "PREPARE_photoBlog_DOWNLOAD": 
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          photos: {
+            coverImage: {
+              ...state.data.photos.coverImage,
+              fileUrl: state.data.photos.coverImage.file ? `images/${state.data.photos.coverImage.file.name}` : null
+            },
+            userImage: {
+              ...state.data.photos.userImage,
+              fileUrl: state.data.photos.userImage.file ? `images/${state.data.photos.userImage.file.name}` : null
+            },
+            otherPhotos: state.data.photos.otherPhotos.map((photo) => {
+              return {
+                ...photo,
+                fileUrl: photo.file ? `images/${photo.file.name}` : null
+              }
+            })
+          }
+        },
+        photoDataBeforeDownlaod: {...state.data.photos}
+      }
+    case "RESET_photoBlog_PHOTOS_AFTER_DOWNLOAD":
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          photos: {...state.photoDataBeforeDownlaod}
+        },
+        photoDataBeforeDownlaod: {}
+      }
+    case "SHOW_DOWNLOAD_photoBlog_LOADER": 
+      return {
+        ...state,
+        downloadLoading: action.show
       }
     default:
       return state

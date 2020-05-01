@@ -15,6 +15,11 @@
       font-weight: 600;
       color: $black;
     }
+    .login-error {
+      color: $red;
+      margin-left: 10px;
+      font-size: 12px;
+    }
     .login-form-container {
       .form-label-group {
         margin-bottom: 20px;
@@ -24,11 +29,6 @@
         color: $black;
         font-size: 18px;
         font-weight: 500;
-      }
-      .login-error {
-        color: $red;
-        margin-left: 10px;
-        font-size: 12px;
       }
       .btn-container {
         display: flex;

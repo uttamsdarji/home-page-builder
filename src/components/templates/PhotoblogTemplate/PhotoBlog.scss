@@ -9,6 +9,9 @@
     width: 80%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
+    &.downloadLoader {
+      background: #fff;
+    }
   }
   .template-preview {
     width: 80%;
@@ -22,6 +25,18 @@
       position: absolute;
       top: 33%;
       font-size: 16px;
+    }
+  }
+  .mask {
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.2);
+    position: fixed;
+    display: none;
+    width: 20%;
+    right: 0;
+    z-index: 10;
+    &.show {
+      display: block;
     }
   }
   .template-edit-container {

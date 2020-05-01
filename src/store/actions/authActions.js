@@ -41,19 +41,26 @@ export function logout(cb) {
   }
 }
 
-export function signup(email,password,cb) {
+export function signup(data,cb) {
   return (dispatch,getState,{getFirebase,getFirestore}) => {
     const firebase = getFirebase();
     const firestore = getFirestore();
     dispatch({type: 'SHOW_MAIN_LOADER', show: true});
-    firebase.auth().createUserWithEmailAndPassword(email,password).then((response) => {
-      return firestore.collection('users').doc(response.user.uid).set({templates:{}}).then(() => {
+    firebase.auth().createUserWithEmailAndPassword(data.email,data.password).then((response) => {
+      return firestore.collection('users').doc(response.user.uid).set({
+        templates:{},
+        firstName: data.firstName,
+        lastName: data.lastName,
+        initials: data.firstName[0] + data.lastName[0]
+      }).then(() => {
         dispatch({type: 'SHOW_MAIN_LOADER', show: false});
+        dispatch({type: 'ADD_SIGNUP_ERROR', error: null});
         if(cb) {
           cb();
         }
       })
     }).catch((e) => {
+      dispatch({type: 'ADD_SIGNUP_ERROR', error: e.message});
       dispatch({type: 'SHOW_MAIN_LOADER', show: false});
     })
   }
