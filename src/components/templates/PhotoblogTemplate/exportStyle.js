@@ -7,9 +7,10 @@ let style = `.template-preview {
 
 .template-preview .navbar {
   background: #000000;
-  position: absolute;
+  position: sticky;
   width: 100%;
   z-index: 1000;
+  top: 0;
 }
 
 .template-preview .navbar .navbar-brand {

@@ -7,8 +7,8 @@ import {connect} from 'react-redux';
 import {OverlayTrigger,Tooltip} from 'react-bootstrap';
 import Loader from '../../Loader';
 import SaveModal from '../../SaveModal/SaveModal';
-import {changeCoverPhoto, removeDefaultPhotos, addPhoto, changeUserPhoto, convertImagestoBase64, downloadTemplate} from '../../../store/actions/templateActions/photoBlogActions';
-import {undoTemplate, redoTemplate, getTemplateFromDb, resetTemplate, saveTemplate} from '../../../store/actions/templateActions/commonTemplateActions';
+import {changeCoverPhoto, removeDefaultPhotos, addPhoto, changeUserPhoto, convertImagestoBase64, downloadTemplate, deletePhoto} from '../../../store/actions/templateActions/photoBlogActions';
+import {undoTemplate, redoTemplate, getTemplateFromDb, resetTemplate, saveTemplate, previewTemplate} from '../../../store/actions/templateActions/commonTemplateActions';
 
 const toBase64 = file => new Promise((resolve, reject) => {
   const reader = new FileReader();
@@ -17,8 +17,8 @@ const toBase64 = file => new Promise((resolve, reject) => {
   reader.onerror = error => reject(error);
 });
 
-async function getBase64(file,cb) {
-  cb(await toBase64(file));
+async function getBase64(file,cb,index) {
+  cb(await toBase64(file),index);
 }
 
 class PhotoBlog extends React.Component {
@@ -27,7 +27,8 @@ class PhotoBlog extends React.Component {
     this.state = {
       textEditorOpen: false,
       textEditorProps: {},
-      saveModalOpen: false
+      saveModalOpen: false,
+      editPhotoIndex: null
     }
   }
   componentDidMount() {
@@ -89,6 +90,13 @@ class PhotoBlog extends React.Component {
       },300)
     }
   }
+  onPhotoEdit = (e) => {
+    let photo = e.target.files && e.target.files[0];
+    let index = this.state.editPhotoIndex;
+    if(photo && index > -1) {
+      getBase64(photo,this.props.addPhoto,index)
+    }
+  }
   onMorePhotosUpload = (e) => {
     let photos = e.target.files;
     if(photos && photos.length > 0) {
@@ -100,12 +108,26 @@ class PhotoBlog extends React.Component {
   downloadTemplate = () => {
     this.props.downloadTemplate()
   }
+  componentWillUnmount() {
+    this.props.previewTemplate('photoBlog',false)
+  }
+  editPhoto = (e,index) => {
+    e.preventDefault();
+    this.setState({
+      editPhotoIndex: index
+    },() => {
+      let inputElement = document.querySelector('#editPhoto');
+      if(inputElement) {
+        inputElement.click();
+      }
+    })
+  }
   render() {
     let {data} = this.props;
     return (
       <div className="photo-blog-template">
         <Loader loading={this.props.loading || this.props.downloadLoading} className={this.props.downloadLoading ? 'downloadLoader' : ''} loadingText={this.props.downloadLoading ? 'Downloading' : ''}></Loader>
-        <div className="template-preview" ref={(container) => {this.templateContainer = container}}>
+        <div className={`template-preview ${this.props.templatePreview ? 'preview' : ''}`} ref={(container) => {this.templateContainer = container}}>
             <nav className="navbar navbar-expand-lg">
               <a className="navbar-brand" href="#" onClick={(e) => {this.toggleTextEditor(e,'navBrand',data.textFields.navBrand,'Website Title')}}>{data.textFields.navBrand}</a>
               <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -147,7 +169,12 @@ class PhotoBlog extends React.Component {
                         data.photos.otherPhotos.map((photo,index) => {
                           return (
                             <div className="col-6 col-md-6 col-lg-4 photo-container" key={index}>
-                              <a href={photo.fileUrl || photo.image} target="_blank" className="d-block photo-item">
+                              {!this.props.downloadLoading &&
+                                <OverlayTrigger placement={'left'} overlay={<Tooltip>Delete Photo</Tooltip>}>
+                                  <div className="delete-image-icon" onClick={() => this.props.deletePhoto(index)}><i className="fas fa-trash-alt"></i></div>
+                                </OverlayTrigger>
+                              }
+                              <a href={photo.fileUrl || photo.image} target="_blank" className="d-block photo-item" onClick={(e) => this.editPhoto(e,index)}>
                                 <img src={photo.fileUrl || photo.image} alt="Image" className="img-fluid" />
                               </a>
                             </div>
@@ -174,6 +201,7 @@ class PhotoBlog extends React.Component {
               </div>
             </main>
         </div>
+        {!this.props.templatePreview &&
         <div className="template-edit-container">
           <div className={`mask ${this.props.loading || this.props.downloadLoading ? 'show' : ''}`}></div>
           <div className="template-edit-title">Photo Blog 
@@ -185,6 +213,7 @@ class PhotoBlog extends React.Component {
           <div className="save-btn" onClick={this.toggleSaveModal}>
             Save Template <i className="fas fa-download"></i>
           </div>
+          <div className="preview-tempalte" onClick={() => this.props.previewTemplate('photoBlog',true)}>Preview</div>
           <SaveModal show={this.state.saveModalOpen} onHide={this.toggleSaveModal} onSave={() => this.props.saveTemplate('photoBlog')}/>
           <div className="undo-btns">
             <span onClick={() => this.props.undoTemplate('photoBlog')} className={`undo ${this.props.prevData && this.props.prevData.length > 0 ? '' : 'disabled'}`}>
@@ -217,10 +246,22 @@ class PhotoBlog extends React.Component {
           <div className="upload-section">
             <div className="cover-upload">
               <span className="cover-label">Change Bio Photo<label htmlFor="userPhoto">Choose Photo</label></span>
-              <input id="userPhoto" type='file' multiple={true} onChange={this.onUserPhotoUpload} accept=".png,.jpeg,.jpg" style={{display: 'none'}}/>
+              <input id="userPhoto" type='file' multiple={false} onChange={this.onUserPhotoUpload} accept=".png,.jpeg,.jpg" style={{display: 'none'}}/>
+            </div>
+          </div>
+          <div className="upload-section" style={{display: 'none'}}>
+            <div className="cover-upload">
+              <span className="cover-label">Edit Photo<label htmlFor="editPhoto">Choose Photo</label></span>
+              <input id="editPhoto" type='file' multiple={false} onChange={this.onPhotoEdit} accept=".png,.jpeg,.jpg" style={{display: 'none'}}/>
             </div>
           </div>
         </div>
+        }
+        {this.props.templatePreview &&
+          <OverlayTrigger placement="left" overlay={<Tooltip>Back to edit template</Tooltip>}>
+            <div className="remove-preview-template" onClick={() => this.props.previewTemplate('photoBlog',false)}>Back</div>
+          </OverlayTrigger>
+        }
         {this.state.textEditorOpen &&
           <EditTextField show={this.state.textEditorOpen} onHide={this.toggleTextEditor} {...this.state.textEditorProps} container={this.templateContainer} />
         }
@@ -235,7 +276,8 @@ const mapStateToProps = (state) => ({
   nextData: state.photoBlog.nextState,
   templateEdited: state.photoBlog.templateEdited,
   loading: state.editTemplate.loading,
-  downloadLoading: state.photoBlog.downloadLoading
+  downloadLoading: state.photoBlog.downloadLoading,
+  templatePreview: state.photoBlog.templatePreview
 })
 
 const mapDispatchToProps = (dispatch)  => ({
@@ -244,12 +286,14 @@ const mapDispatchToProps = (dispatch)  => ({
   changeCoverPhoto: (photo) => dispatch(changeCoverPhoto(photo)),
   resetTemplate: (templateId) => dispatch(resetTemplate(templateId)),
   removeDefaultPhotos: () => dispatch(removeDefaultPhotos()),
-  addPhoto: (photo) => dispatch(addPhoto(photo)),
+  addPhoto: (photo,index) => dispatch(addPhoto(photo,index)),
   changeUserPhoto: (photo) => dispatch(changeUserPhoto(photo)),
   getTemplateFromDb: (templateId) => dispatch(getTemplateFromDb(templateId)),
   convertImagestoBase64: () => dispatch(convertImagestoBase64()),
   saveTemplate: (templateId) => dispatch(saveTemplate(templateId)),
-  downloadTemplate: () => dispatch(downloadTemplate())
+  downloadTemplate: () => dispatch(downloadTemplate()),
+  previewTemplate: (templateId,flag) => dispatch(previewTemplate(templateId,flag)),
+  deletePhoto: (index) => dispatch(deletePhoto(index))
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(PhotoBlog);

@@ -109,12 +109,17 @@ export function editTextField(templateId,fieldKey,fieldValue) {
   }
 }
 
+export function previewTemplate(templateId,preview) {
+  return (dispatch,getState) => {
+    dispatch({type: "TOGGLE_HEADER", flag: preview})
+    dispatch({type: `PREVIEW_${templateId}_PREVIEW`, flag: preview})
+  }
+}
+
 export const getHTMLHeader = (title) => {
   let header = `<head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-                <meta name="description" content="Modern e-commerce fulfilment, built for speed
-                We store your inventory closer to your demand, allowing you to offer same-day/next-day delivery">
                 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
                 <link href="https://fonts.googleapis.com/css?family=Poppins:thin,thinItalic,extra-light,extra-lightItalic,regular,regularItalic,medium,mediumItalic,semi-bold,semi-boldItalic,bold,boldItalic"
                 rel="stylesheet">

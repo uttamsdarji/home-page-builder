@@ -6,7 +6,8 @@ const initialState = {
   nextState: [],
   templateEdited: false,
   photoDataBeforeDownlaod: {},
-  downloadLoading: false
+  downloadLoading: false,
+  templatePreview: false
 }
 
 const photoBlogReducer = (state = initialState, action) => {
@@ -104,19 +105,53 @@ const photoBlogReducer = (state = initialState, action) => {
           }
         }
       } else {
-        return {
-          ...state,
-          data: {
-            ...state.data,
-            photos: {
-              ...state.data.photos,
-              otherPhotos: state.data.photos.otherPhotos.concat([{image: action.image, file: action.file}])
-            }
-          },
-          prevState: state.prevState.concat([{...state.data}]),
-          nextState: [],
-          templateEdited: true
+        if(action.index || action.index === 0) {
+          let newPhotos = [...state.data.photos.otherPhotos];
+          newPhotos[action.index] = {image: action.image, file: action.file};
+          return {
+            ...state,
+            data: {
+              ...state.data,
+              photos: {
+                ...state.data.photos,
+                otherPhotos: newPhotos
+              }
+            },
+            prevState: state.prevState.concat([{...state.data}]),
+            nextState: [],
+            templateEdited: true
+          }
+        } else {
+          return {
+            ...state,
+            data: {
+              ...state.data,
+              photos: {
+                ...state.data.photos,
+                otherPhotos: state.data.photos.otherPhotos.concat([{image: action.image, file: action.file}])
+              }
+            },
+            prevState: state.prevState.concat([{...state.data}]),
+            nextState: [],
+            templateEdited: true
+          }
         }
+      }
+    case "DELETE_photoBlog_PHOTO":
+      let newPhotos = [...state.data.photos.otherPhotos];
+      newPhotos = newPhotos.slice(0,action.index).concat(newPhotos.slice(action.index+1, newPhotos.length));
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          photos: {
+            ...state.data.photos,
+            otherPhotos: newPhotos
+          }
+        },
+        prevState: state.prevState.concat([{...state.data}]),
+        nextState: [],
+        templateEdited: true
       }
     case "CHANGE_photoBlog_USER_PHOTO":
       if(action.notEdited) {
@@ -198,6 +233,11 @@ const photoBlogReducer = (state = initialState, action) => {
       return {
         ...state,
         downloadLoading: action.show
+      }
+    case "PREVIEW_photoBlog_PREVIEW":
+      return {
+        ...state,
+        templatePreview: action.flag
       }
     default:
       return state

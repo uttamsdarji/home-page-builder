@@ -28,6 +28,12 @@ export function addPhoto(photo, index, notEdited) {
   }
 }
 
+export function deletePhoto(index) {
+  return (dispatch,getState) => {
+    dispatch({type: "DELETE_photoBlog_PHOTO", index})
+  }
+}
+
 var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
 
 export function convertImagestoBase64() {
